@@ -1,0 +1,33 @@
+name: Daily Space Fact Sender
+
+on:
+  schedule:
+    - cron: "30 3 * * *"  # Runs daily at 9:00 AM IST (3:30 UTC)
+  workflow_dispatch:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+
+      - name: Compile and Package .jar
+        run: |
+          mkdir out
+          javac -cp "libs/*" -d out src/*.java
+          jar cvfe SpaceFactSender.jar Main -C out .
+
+      - name: Run Java app
+        env:
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: java -cp "libs/*:SpaceFactSender.jar" Main

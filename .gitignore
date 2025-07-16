@@ -35,7 +35,6 @@ out/
 
 out/
 *.class
-*.jar
 .idea/
 *.iml
 
